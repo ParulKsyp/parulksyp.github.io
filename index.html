@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do App</title>
+  <meta name="theme-color" content="#020617" />
+  <link rel="manifest" href="manifest.json" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .todo-container {
+      background: #020617;
+      padding: 25px;
+      border-radius: 10px;
+      width: 360px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    h2 { text-align: center; color: #38bdf8; }
+
+    input {
+      width: 100%; padding: 10px; border-radius: 5px; border: none; margin-bottom: 10px;
+    }
+
+    button {
+      padding: 8px 12px; border: none; border-radius: 5px; cursor: pointer;
+    }
+
+    .add-btn {
+      width: 100%; background: #38bdf8; font-weight: bold;
+    }
+
+    ul { list-style: none; margin-top: 15px; padding: 0; }
+
+    li {
+      background: #0f172a; padding: 10px; margin-bottom: 8px;
+      border-radius: 5px; display: flex; justify-content: space-between;
+    }
+
+    .edit { background: #22c55e; }
+    .delete { background: #ef4444; color: white; }
+  </style>
+</head>
+<body>
+
+  <div class="todo-container">
+    <h2>To-Do App</h2>
+    <input type="text" id="taskInput" placeholder="New task" />
+    <button class="add-btn" onclick="addTask()">Add</button>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+    function saveTasks() {
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    function displayTasks() {
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      tasks.forEach((task, i) => {
+        list.innerHTML += `
+          <li>
+            <span>${task}</span>
+            <div>
+              <button class="edit" onclick="editTask(${i})">Edit</button>
+              <button class="delete" onclick="deleteTask(${i})">Del</button>
+            </div>
+          </li>`;
+      });
+    }
+
+    function addTask() {
+      const input = document.getElementById('taskInput');
+      if (!input.value.trim()) return;
+      tasks.push(input.value);
+      input.value = '';
+      saveTasks(); displayTasks();
+    }
+
+    function editTask(i) {
+      const updated = prompt('Edit task', tasks[i]);
+      if (updated !== null) { tasks[i] = updated; saveTasks(); displayTasks(); }
+    }
+
+    function deleteTask(i) {
+      tasks.splice(i, 1); saveTasks(); displayTasks();
+    }
+
+    displayTasks();
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
+  </script>
+
+</body>
+</html>
